@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import React, { useState, FC } from 'react';
+import { View, Text, FlatList, StyleSheet, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SearchBar from '../components/SearchBar';
 import ClienteCard from '../components/ClienteCard';
 import { clientesData } from '../data/mockData';
 import { colors } from '../utils/colors';
+import { Cliente, NavigationProps } from '../types';
 
-const ClientesSearchScreen = ({ navigation }) => {
-  const [searchText, setSearchText] = useState('');
-  const [filteredClientes, setFilteredClientes] = useState(clientesData);
+interface ClientesSearchScreenProps {
+  navigation: NavigationProps;
+}
 
-  const handleSearch = (text) => {
+const ClientesSearchScreen: FC<ClientesSearchScreenProps> = ({ navigation }) => {
+  const [searchText, setSearchText] = useState<string>('');
+  const [filteredClientes, setFilteredClientes] = useState<Cliente[]>(clientesData);
+
+  const handleSearch = (text: string): void => {
     setSearchText(text);
     if (text === '') {
       setFilteredClientes(clientesData);
     } else {
-      const filtered = clientesData.filter(cliente =>
+      const filtered = clientesData.filter((cliente: Cliente) =>
         cliente.nombre.toLowerCase().includes(text.toLowerCase()) ||
         cliente.direccion.toLowerCase().includes(text.toLowerCase())
       );
@@ -23,7 +28,7 @@ const ClientesSearchScreen = ({ navigation }) => {
     }
   };
 
-  const renderCliente = ({ item }) => (
+  const renderCliente: ListRenderItem<Cliente> = ({ item }) => (
     <ClienteCard 
       cliente={item} 
       onPress={() => navigation.navigate('ClienteDetail', { cliente: item })}
@@ -45,7 +50,7 @@ const ClientesSearchScreen = ({ navigation }) => {
       <FlatList
         data={filteredClientes}
         renderItem={renderCliente}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item: Cliente) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
       />

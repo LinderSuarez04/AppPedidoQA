@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, FC } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import ClienteCard from '../components/ClienteCard';
 import { clientesData } from '../data/mockData';
 import { colors } from '../utils/colors';
+import { Cliente, NavigationProps } from '../types';
 
-const ClientesScreen = ({ navigation }) => {
-  const [clientesProgramados] = useState(3);
+interface ClientesScreenProps {
+  navigation: NavigationProps;
+}
 
-  const renderCliente = ({ item }) => (
+const ClientesScreen: FC<ClientesScreenProps> = ({ navigation }) => {
+  const [clientesProgramados] = useState<number>(3);
+
+  const renderCliente: ListRenderItem<Cliente> = ({ item }) => (
     <ClienteCard 
       cliente={item} 
       onPress={() => navigation.navigate('ClienteDetail', { cliente: item })}
     />
   );
+
+  const handleSearchPress = (): void => {
+    navigation.navigate('ClientesSearch');
+  };
 
   return (
     <View style={styles.container}>
@@ -34,7 +43,7 @@ const ClientesScreen = ({ navigation }) => {
         <FlatList
           data={clientesData}
           renderItem={renderCliente}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item: Cliente) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
         />
@@ -42,7 +51,7 @@ const ClientesScreen = ({ navigation }) => {
         {/* Botón flotante para buscar/agregar clientes */}
         <TouchableOpacity 
           style={styles.fab}
-          onPress={() => navigation.navigate('ClientesSearch')}
+          onPress={handleSearchPress}
         >
           <Ionicons name="add" size={24} color={colors.white} />
         </TouchableOpacity>

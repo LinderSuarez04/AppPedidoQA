@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, FC } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,21 +8,45 @@ import ContactoTab from '../components/tabs/ContactoTab';
 import GeograficosTab from '../components/tabs/GeograficosTab';
 import ActividadTab from '../components/tabs/ActividadTab';
 import { colors } from '../utils/colors';
+import { Cliente, NavigationProps } from '../types';
 
-const ClienteDetailScreen = ({ route, navigation }) => {
+interface RouteParams {
+  params: {
+    cliente: Cliente;
+  };
+}
+
+interface ClienteDetailScreenProps {
+  route: RouteParams;
+  navigation: NavigationProps;
+}
+
+interface TabItem {
+  id: string;
+  label: string;
+  component: FC<{ cliente: Cliente }>;
+}
+
+type TabId = 'basicos' | 'contacto' | 'geograficos' | 'actividad';
+
+const ClienteDetailScreen: FC<ClienteDetailScreenProps> = ({ route, navigation }) => {
   const { cliente } = route.params;
-  const [activeTab, setActiveTab] = useState('basicos');
+  const [activeTab, setActiveTab] = useState<TabId>('basicos');
 
-  const tabs = [
+  const tabs: TabItem[] = [
     { id: 'basicos', label: 'BÁSICOS', component: BasicosTab },
     { id: 'contacto', label: 'CONTACTO', component: ContactoTab },
     { id: 'geograficos', label: 'UBICACIÓN', component: GeograficosTab },
     { id: 'actividad', label: 'ACTIVIDAD', component: ActividadTab },
   ];
 
-  const renderTabContent = () => {
+  const renderTabContent = (): JSX.Element | null => {
     const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
     return ActiveComponent ? <ActiveComponent cliente={cliente} /> : null;
+  };
+
+  const handleTabPress = (tabId: string): void => {
+    setActiveTab(tabId as TabId);
   };
 
   return (
@@ -31,14 +55,14 @@ const ClienteDetailScreen = ({ route, navigation }) => {
       
       <View style={styles.content}>
         <View style={styles.tabContainer}>
-          {tabs.map((tab) => (
+          {tabs.map((tab: TabItem) => (
             <TouchableOpacity
               key={tab.id}
               style={[
                 styles.tab,
                 activeTab === tab.id && styles.activeTab
               ]}
-              onPress={() => setActiveTab(tab.id)}
+              onPress={() => handleTabPress(tab.id)}
             >
               <Text style={[
                 styles.tabText,
